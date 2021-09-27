@@ -22,7 +22,7 @@
         "source": "https://github.com/kenny08gt/versionable"
     },
     "require": {
-        "php": ">=7.1.0 || >=7.2.5",
+        "php": "^7.3|^8.0",
         "illuminate/support": "~5.3 || ^6.0 || ^7.0 || ^8.0"
     },
     "require-dev": {
@@ -36,7 +36,7 @@
             "tests/VersionableTestCase.php"
         ],
         "psr-0": {
-            "Mpociot\\Versionable": "src/"
+            "Kenny08gt\\Versionable": "src/"
         }
     },
     "scripts": {
@@ -45,7 +45,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Mpociot\\Versionable\\Providers\\ServiceProvider"
+                "Kenny08gt\\Versionable\\Providers\\ServiceProvider"
             ]
         }
     }

@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Mockery as m;
 use Illuminate\Database\Eloquent\Model;
-use Mpociot\Versionable\Version;
-use Mpociot\Versionable\VersionableTrait;
+use Kenny08gt\Versionable\Version;
+use Kenny08gt\Versionable\VersionableTrait;
 
 class VersionableTest extends VersionableTestCase
 {
@@ -513,27 +513,72 @@ class VersionableTest extends VersionableTestCase
 
         $this->assertArrayNotHasKey('password', $user->toArray());
     }
- 
+
+    public function testGetLastNotApprovedChanges()
+    {
+        $user = new TestVersionableUser();
+        $user->name = "Marcel";
+        $user->email = "m.pociot@test.php";
+        $user->password = "12345";
+        $user->setApprovedAttribute(true);
+        $user->save();
+
+        $user->name = "John";
+        $user->email = "john@snow.com";
+        $user->setApprovedAttribute(false);
+        $user->save();
+
+        $user->name = "Julia";
+        $user->setApprovedAttribute(false);
+        $user->save();
+
+        $this->assertEquals($user->versions()->count(), 3);
+
+        $model = $user->getLastNotApprovedChanges();
+        $this->assertEquals($model->name, "Julia");
+        $this->assertEquals($model->email, "john@snow.com");
+    }
+
+    public function testGetLastApprovedVersion()
+    {
+
+        $user = new TestVersionableUser();
+        $user->name = "Marcel";
+        $user->email = "m.pociot@test.php";
+        $user->password = "12345";
+        $user->last_login = $user->freshTimestamp();
+        $user->save();
+
+        $user->name = "John";
+        $user->email = "john@snow.com";
+        $user->setApprovedAttribute(true);
+        $user->save();
+
+        $user->name = "Julia";
+        $user->save();
+
+        $version = $user->getLastApprovedVersion();
+        $model = $version->getModel();
+
+        $this->assertEquals($model->name, "John");
+    }
 }
 
 
-
-
 class TestVersionableUser extends \Illuminate\Foundation\Auth\User {
-    use \Mpociot\Versionable\VersionableTrait;
-
+    use Kenny08gt\Versionable\VersionableTrait;
     protected $table = "users";
 }
 
 class TestVersionableSoftDeleteUser extends Illuminate\Database\Eloquent\Model {
-    use \Mpociot\Versionable\VersionableTrait;
+    use Kenny08gt\Versionable\VersionableTrait;
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $table = "users";
 }
 
 class ModelWithMaxVersions extends Illuminate\Database\Eloquent\Model {
-    use \Mpociot\Versionable\VersionableTrait;
+    use VersionableTrait;
 
     protected $table = "users";
 
@@ -541,7 +586,7 @@ class ModelWithMaxVersions extends Illuminate\Database\Eloquent\Model {
 }
 
 class TestPartialVersionableUser extends Illuminate\Database\Eloquent\Model {
-    use \Mpociot\Versionable\VersionableTrait;
+    use VersionableTrait;
 
     protected $table = "users";
 
@@ -571,7 +616,7 @@ class ModelWithJsonField extends Model
 }
 
 class TestHiddenFieldsUser extends \Illuminate\Foundation\Auth\User {
-    use \Mpociot\Versionable\VersionableTrait;
+    use \Kenny08gt\Versionable\VersionableTrait;
 
     protected $table = "users";
 

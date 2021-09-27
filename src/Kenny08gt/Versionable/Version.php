@@ -1,5 +1,5 @@
 <?php
-namespace Mpociot\Versionable;
+namespace Kenny08gt\Versionable;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Version
- * @package Mpociot\Versionable
+ * @package Kenny08gt\Versionable
  */
 class Version extends Eloquent
 {

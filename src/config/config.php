@@ -7,6 +7,6 @@ return [
      * Feel free to change this, if you need specific version
      * model logic.
      */
-    'version_model' => \Mpociot\Versionable\Version::class
+    'version_model' => \Kenny08gt\Versionable\Version::class
 
 ];

@@ -33,7 +33,7 @@ abstract class VersionableTestCase extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
-            \Mpociot\Versionable\Providers\ServiceProvider::class,
+            \Kenny08gt\Versionable\Providers\ServiceProvider::class,
         ];
     }
 

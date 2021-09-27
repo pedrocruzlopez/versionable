@@ -20,6 +20,7 @@ class CreateVersionsTable extends Migration {
 			$table->string('versionable_type');
 			$table->string('user_id')->nullable();
 			$table->longText('model_data');
+            $table->boolean('approved')->default(false);
 			$table->string('reason', 100)->nullable();
 			$table->index('versionable_id');
 			$table->timestamps();

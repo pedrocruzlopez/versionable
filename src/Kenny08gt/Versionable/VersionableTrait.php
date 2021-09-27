@@ -1,12 +1,13 @@
 <?php
-namespace Mpociot\Versionable;
+
+namespace Kenny08gt\Versionable;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Class VersionableTrait
- * @package Mpociot\Versionable
+ * @package Kenny08gt\Versionable
  */
 trait VersionableTrait
 {
@@ -14,14 +15,14 @@ trait VersionableTrait
     /**
      * Retrieve, if exists, the property that define that Version model.
      * If no property defined, use the default Version model.
-     * 
+     *
      * Trait cannot share properties whth their class !
      * http://php.net/manual/en/language.oop5.traits.php
      * @return unknown|string
      */
     protected function getVersionClass()
     {
-        if( property_exists( self::class, 'versionClass') ) {
+        if (property_exists(self::class, 'versionClass')) {
             return $this->versionClass;
         }
 
@@ -47,6 +48,9 @@ trait VersionableTrait
      * @var string
      */
     private $reason;
+
+
+    private $versionApproved;
 
     /**
      * Flag that determines if the model allows versioning at all
@@ -83,6 +87,11 @@ trait VersionableTrait
         $this->reason = $value;
     }
 
+    public function setApprovedAttribute($value)
+    {
+        $this->versionApproved = $value;
+    }
+
     /**
      * Initialize model events
      */
@@ -104,7 +113,7 @@ trait VersionableTrait
      */
     public function versions()
     {
-        return $this->morphMany( $this->getVersionClass(), 'versionable');
+        return $this->morphMany($this->getVersionClass(), 'versionable');
     }
 
     /**
@@ -148,9 +157,9 @@ trait VersionableTrait
      */
     protected function versionablePreSave()
     {
-        if ($this->versioningEnabled === true) {
+        if ($this->isVersioningEnable()) {
             $this->versionableDirtyData = $this->getDirty();
-            $this->updating             = $this->exists;
+            $this->updating = $this->exists;
         }
     }
 
@@ -163,25 +172,30 @@ trait VersionableTrait
         /**
          * We'll save new versions on updating and first creation
          */
-        if (
-            ( $this->versioningEnabled === true && $this->updating && $this->isValidForVersioning() ) ||
-            ( $this->versioningEnabled === true && !$this->updating && !is_null($this->versionableDirtyData) && count($this->versionableDirtyData))
-        ) {
+        if ($this->isValidForUpdate() || $this->itHasDirtyData()) {
             // Save a new version
-            $class                     = $this->getVersionClass();
-            $version                   = new $class();
-            $version->versionable_id   = $this->getKey();
+            $class = $this->getVersionClass();
+            $version = new $class();
+            $version->versionable_id = $this->getKey();
             $version->versionable_type = method_exists($this, 'getMorphClass') ? $this->getMorphClass() : get_class($this);
-            $version->user_id          = $this->getAuthUserId();
-            
+            $version->user_id = $this->getAuthUserId();
+
             $versionedHiddenFields = $this->versionedHiddenFields ?? [];
             $this->makeVisible($versionedHiddenFields);
-            $version->model_data       = serialize($this->attributesToArray());
+            $attributes = $this->attributesToArray();
+            // TODO
+            // 1. get last approved version or get last version modified by the same user
+            // 2. merge attributes. Prioritize the new ones
+            // 3.
+            $version->model_data = serialize($attributes);
             $this->makeHidden($versionedHiddenFields);
 
-            if (!empty( $this->reason )) {
+            if (!empty($this->reason)) {
                 $version->reason = $this->reason;
             }
+
+            if(!empty($this->versionApproved))
+                $version->approved = $this->versionApproved;
 
             $version->save();
 
@@ -189,26 +203,62 @@ trait VersionableTrait
         }
     }
 
+    public function getLastNotApprovedChanges()
+    {
+        $latest_version = $this->getLastApprovedVersion();
+        if(!$latest_version)
+            return null;
+
+        $latest_model = $latest_version->getModel();
+
+        $versions = $this->versions()
+            ->where('version_id', ">", $latest_version->version_id)
+            ->where('approved', '=', false)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+
+        foreach ($versions as $version) {
+//            $diff = $version->diff($latest_version);
+            $diff = $latest_version->diff($version);
+            $latest_model->unguard();
+            $latest_model->fill($diff);
+            $latest_model->reguard();
+        }
+
+        return $latest_model;
+
+    }
+
+    public function getLastApprovedVersion()
+    {
+        return $this->versions()
+            ->where('versionable_id', $this->id)
+            ->where('approved', true)
+            ->orderBy('id', 'desc')
+            ->first();
+    }
+
     /**
      * Delete old versions of this model when the reach a specific count.
-     * 
+     *
      * @return void
      */
     private function purgeOldVersions()
     {
         $keep = isset($this->keepOldVersions) ? $this->keepOldVersions : 0;
-        
+
         if ((int)$keep > 0) {
             $count = $this->versions()->count();
-            
+
             if ($count > $keep) {
                 $this->getLatestVersions()
                     ->take($count)
                     ->skip($keep)
                     ->get()
                     ->each(function ($version) {
-                    $version->delete();
-                });
+                        $version->delete();
+                    });
             }
         }
     }
@@ -220,14 +270,14 @@ trait VersionableTrait
      */
     private function isValidForVersioning()
     {
-        $dontVersionFields = isset( $this->dontVersionFields ) ? $this->dontVersionFields : [];
-        $removeableKeys    = array_merge($dontVersionFields, [$this->getUpdatedAtColumn()]);
+        $dontVersionFields = isset($this->dontVersionFields) ? $this->dontVersionFields : [];
+        $removeableKeys = array_merge($dontVersionFields, [$this->getUpdatedAtColumn()]);
 
         if (method_exists($this, 'getDeletedAtColumn')) {
             $removeableKeys[] = $this->getDeletedAtColumn();
         }
 
-        return ( count(array_diff_key($this->versionableDirtyData, array_flip($removeableKeys))) > 0 );
+        return (count(array_diff_key($this->versionableDirtyData, array_flip($removeableKeys))) > 0);
     }
 
     /**
@@ -244,6 +294,30 @@ trait VersionableTrait
     protected function getLatestVersions()
     {
         return $this->versions()->orderByDesc('version_id');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isVersioningEnable(): bool
+    {
+        return $this->versioningEnabled === true;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isValidForUpdate(): bool
+    {
+        return $this->isVersioningEnable() && $this->updating && $this->isValidForVersioning();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function itHasDirtyData(): bool
+    {
+        return $this->isVersioningEnable() && !$this->updating && !is_null($this->versionableDirtyData) && count($this->versionableDirtyData);
     }
 
 
