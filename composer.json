@@ -1,7 +1,7 @@
 {
-    "name": "mpociot/versionable",
+    "name": "kenny08gt/versionable",
     "license": "MIT",
-    "description": "Allows to create Laravel 4 / 5 / 6 / 7 Model versioning and restoring",
+    "description": "Fork from mpociot/versionable Allows to create Laravel 4 / 5 / 6 / 7 Model versioning and restoring",
     "keywords": [
         "model",
         "laravel",
@@ -10,16 +10,16 @@
         "history",
         "restore"
     ],
-    "homepage": "http://github.com/mpociot/versionable",
+    "homepage": "https://github.com/kenny08gt/versionable",
     "authors": [
         {
-            "name": "Marcel Pociot",
-            "email": "m.pociot@gmail.com"
+            "name": "Alan Hurtarte",
+            "email": "alan.hurtarte@gmail.com"
         }
     ],
     "support": {
-        "issues": "https://github.com/mpociot/versionable/issues",
-        "source": "https://github.com/mpociot/versionable"
+        "issues": "https://github.com/kenny08gt/versionable/issues",
+        "source": "https://github.com/kenny08gt/versionable"
     },
     "require": {
         "php": ">=7.1.0 || >=7.2.5",
