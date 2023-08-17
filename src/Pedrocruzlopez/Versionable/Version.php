@@ -1,5 +1,5 @@
 <?php
-namespace Kenny08gt\Versionable;
+namespace Pedrocruzlopez\Versionable;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Version
- * @package Kenny08gt\Versionable
+ * @package Pedrocruzlopez\Versionable
  */
 class Version extends Eloquent
 {

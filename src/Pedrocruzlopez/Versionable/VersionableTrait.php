@@ -1,13 +1,13 @@
 <?php
 
-namespace Kenny08gt\Versionable;
+namespace Pedrocruzlopez\Versionable;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Class VersionableTrait
- * @package Kenny08gt\Versionable
+ * @package Pedrocruzlopez\Versionable
  */
 trait VersionableTrait
 {

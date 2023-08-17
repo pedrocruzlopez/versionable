@@ -10,16 +10,16 @@
         "history",
         "restore"
     ],
-    "homepage": "https://github.com/kenny08gt/versionable",
+    "homepage": "https://github.com/pedrocruzlopez/versionable",
     "authors": [
         {
-            "name": "Alan Hurtarte",
-            "email": "alan.hurtarte@gmail.com"
+            "name": "Pedro Cruz",
+            "email": "pedrocruz.dev@gmail.com"
         }
     ],
     "support": {
-        "issues": "https://github.com/kenny08gt/versionable/issues",
-        "source": "https://github.com/kenny08gt/versionable"
+        "issues": "https://github.com/pedrocruzlopez/versionable/issues",
+        "source": "https://github.com/pedrocruzlopez/versionable"
     },
     "require": {
         "php": "^7.3|^8.0",
@@ -36,7 +36,7 @@
             "tests/VersionableTestCase.php"
         ],
         "psr-0": {
-            "Kenny08gt\\Versionable": "src/"
+            "Pedrocruzlopez\\Versionable": "src/"
         }
     },
     "scripts": {
@@ -45,7 +45,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Kenny08gt\\Versionable\\Providers\\ServiceProvider"
+                "Pedrocruzlopez\\Versionable\\Providers\\ServiceProvider"
             ]
         }
     }

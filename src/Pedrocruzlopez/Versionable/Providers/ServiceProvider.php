@@ -1,6 +1,6 @@
 <?php
 
-namespace Kenny08gt\Versionable\Providers;
+namespace Pedrocruzlopez\Versionable\Providers;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
