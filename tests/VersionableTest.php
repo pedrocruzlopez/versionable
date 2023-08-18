@@ -566,12 +566,12 @@ class VersionableTest extends VersionableTestCase
 
 
 class TestVersionableUser extends \Illuminate\Foundation\Auth\User {
-    use Kenny08gt\Versionable\VersionableTrait;
+    use Pedrocruzlopez\Versionable\VersionableTrait;
     protected $table = "users";
 }
 
 class TestVersionableSoftDeleteUser extends Illuminate\Database\Eloquent\Model {
-    use Kenny08gt\Versionable\VersionableTrait;
+    use Pedrocruzlopez\Versionable\VersionableTrait;
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $table = "users";
@@ -616,7 +616,7 @@ class ModelWithJsonField extends Model
 }
 
 class TestHiddenFieldsUser extends \Illuminate\Foundation\Auth\User {
-    use \Kenny08gt\Versionable\VersionableTrait;
+    use \Pedrocruzlopez\Versionable\VersionableTrait;
 
     protected $table = "users";
 
